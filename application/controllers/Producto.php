@@ -24,13 +24,29 @@ class Producto extends CI_Controller {
             'precio' => $this->input->post('precio')
         ];
         $this->Producto_model->insert($data);
-        redirect('producto');
+        redirect('producto/index');
     }
 
-    public function edit($id) {
-        $data['producto'] = $this->Producto_model->get($id);
-        $this->load->view('producto/edit', $data);
+    public function edit($id = null) {
+        // Verificar si no se proporcionó un ID
+        if ($id === null) {
+            show_404(); // Mostrar error 404 si no se pasa el ID
+        }
+
+        // Cargar el modelo si es necesario
+        $this->load->model('ProductoModel');
+
+        // Obtener el producto de la base de datos
+        $producto = $this->ProductoModel->getProductoById($id);
+
+        if (!$producto) {
+            show_404(); // Mostrar error 404 si el producto no existe
+        }
+
+        // Cargar la vista y pasar los datos del producto
+        $this->load->view('edit', ['producto' => $producto]);
     }
+
 
     public function update($id) {
         $data = [
@@ -39,11 +55,11 @@ class Producto extends CI_Controller {
             'precio' => $this->input->post('precio')
         ];
         $this->Producto_model->update($id, $data);
-        redirect('producto');
+        redirect('producto/index');
     }
 
     public function delete($id) {
         $this->Producto_model->delete($id);
-        redirect('producto');
+        redirect('producto/index');
     }
 }
